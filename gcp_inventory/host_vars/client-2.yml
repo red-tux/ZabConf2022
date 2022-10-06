@@ -1,0 +1,4 @@
+---
+zabbix_agent_server: proxy-2.gcp.red-tux.com
+zabbix_agent_serveractive	: proxy-2.gcp.red-tux.com
+zabbix_proxy: proxy-2

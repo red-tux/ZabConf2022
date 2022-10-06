@@ -1,0 +1,37 @@
+---
+all:
+  hosts:
+    zbxs1.lab.mclean.red-tux.net:
+    zbxp1.lab.mclean.red-tux.net:
+    zbxp2.lab.mclean.red-tux.net:
+    zbxc1.lab.mclean.red-tux.net:
+    zbxc2.lab.mclean.red-tux.net:
+    zbxc3.lab.mclean.red-tux.net:
+    zbxc4.lab.mclean.red-tux.net:
+  children: 
+    zabbix:
+      hosts:
+        zbxs1.lab.mclean.red-tux.net:
+        zbxp1.lab.mclean.red-tux.net:
+        zbxp2.lab.mclean.red-tux.net:
+        zbxc1.lab.mclean.red-tux.net:
+        zbxc2.lab.mclean.red-tux.net:
+        zbxc3.lab.mclean.red-tux.net:
+        zbxc4.lab.mclean.red-tux.net:
+    zabbix_server:
+      hosts:
+        zbxs1.lab.mclean.red-tux.net:
+    zabbix_proxy:
+      hosts:
+        zbxp1.lab.mclean.red-tux.net:
+        zbxp2.lab.mclean.red-tux.net:
+    zabbix_client:
+      hosts:
+        zbxc1.lab.mclean.red-tux.net:
+        zbxc2.lab.mclean.red-tux.net:
+        zbxc3.lab.mclean.red-tux.net:
+        zbxc4.lab.mclean.red-tux.net:
+
+  vars:
+    ansible_user: root
+

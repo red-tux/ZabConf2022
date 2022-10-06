@@ -1,0 +1,188 @@
+---
+- hosts: zabbix_server
+  become: true
+
+  pre_tasks:
+  - name: Install postgresql-server and other packages
+    dnf:
+      name: "{{ item }}"
+      state: present
+    loop:
+    - python3-psycopg2
+    - python3-netaddr
+    - python3-libsemanage
+    - postgresql-server
+    - '@php:7.4'
+    - php-pgsql
+
+  - name: initialze the DB
+    command:
+      cmd: /usr/bin/postgresql-setup --initdb
+    ignore_errors: true
+    register: init_db
+    # when: rpm_inst_out.changed
+
+  - name: start DB
+    ansible.builtin.systemd:
+      name: postgresql
+      state: started
+      enabled: true
+    # when: init_db.rc | default(1) == 0
+
+  - name: create db user
+    become: true
+    become_user: postgres
+    community.postgresql.postgresql_user:
+      name: zabbix
+      password: "{{ zabbix_server_dbpassword }}"
+  
+  - name: create zabbix db
+    become: true
+    become_user: postgres
+    community.postgresql.postgresql_db:
+      name: zabbix
+      owner: zabbix
+    register: create_db_out
+
+  - name: allow zabbix user full permissions
+    become: true
+    become_user: postgres
+    community.postgresql.postgresql_privs:
+      db: zabbix
+      privs: ALL
+      roles: zabbix
+      type: database
+
+  - name: allow zabbix access to zabbix
+    become: true
+    become_user: postgres
+    community.postgresql.postgresql_pg_hba:
+      dest: /var/lib/pgsql/data/pg_hba.conf
+      contype: host
+      users: zabbix
+      source: ::1
+      databases: zabbix
+      method: md5
+      state: present
+    register: pg_hba
+
+  - name: Restart postgres
+    ansible.builtin.systemd:
+      name: postgresql
+      state: restarted
+    when: pg_hba.changed
+    
+  - name: populate DB
+    # become: true
+    become_user: postgres
+    shell:
+      cmd: 'zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | psql -h localhost zabbix zabbix'
+    environment:
+      PGPASSWORD: "{{ zabbix_server_dbpassword }}"
+    when: create_db_out.changed
+  
+  # - name: Enable php 7.4 stream
+  #   dnf:
+  #     name: '@php:7.4'
+  #     state: present
+  
+  # - name: Ensure php packages are installed
+  #   dnf:
+  #     name: '{{ item }}'
+  #     state: present
+  #   loop:
+  #   - php-pgsql
+
+  - name: allow execmem selinux
+    ansible.posix.seboolean:
+      name: httpd_execmem
+      state: yes
+      persistent: yes
+
+  - name: Copy SSL certs
+    copy:
+      src: "certs/{{ item.name }}"
+      dest: "{{ item.dest }}"
+      owner: "{{ item.owner | default('root') }}"
+      group: "{{ item.group | default('root') }}"
+      mode: "{{ item.mode | default('0644') }}"
+    loop:
+    - name: self-signed.key
+      dest: /etc/pki/tls/private/
+      mode: '0600'
+    - name: self-signed.crt
+      dest: /etc/pki/tls/certs/
+    # - name: 20221002-2p8-g9s.private.pem
+    #   dest: /etc/pki/tls/private/
+    #   mode: '0600'
+    # - name: ca.crt
+    #   dest: /etc/pki/ca-trust/source/anchors
+    # - name: certificate.crt
+    #   dest: /etc/pki/tls/certs/
+    register: certs_copy
+    tags:
+    - ssl
+
+  - name: Rebuild CA bundle
+    command: update-ca-trust
+    when: certs_copy.changed
+    tags:
+    - ssl
+
+  # - debug: var=hostvars
+  #   tags:
+  #   - zabbix-server
+    
+  roles:
+    - role: geerlingguy.apache
+    - role: geerlingguy.php
+    - role: community.zabbix.zabbix_server
+    - role: community.zabbix.zabbix_web
+    - role: community.zabbix.zabbix_agent
+
+#####################################
+# Proxy configuration play
+#####################################
+
+- hosts: zabbix_proxy
+  become: true
+
+  vars:
+    zabbix_proxy_name: "{{ ansible_hostname }}"
+    
+  pre_tasks:
+  - name: Needed packages
+    dnf:
+      name: "{{ item }}"
+      state: present
+    loop:
+    - python3-netaddr
+    - python3-libsemanage
+# sudo su - zabbix -s /bin/bash
+# cd
+# cat /usr/share/zabbix-sql-scripts/sqlite3/proxy.sql | sqlite3 zabbix_proxy.db
+
+  roles:
+  - role: community.zabbix.zabbix_proxy
+  - role: community.zabbix.zabbix_agent
+
+#####################################
+# Client configuration play
+#####################################
+# If a host is migrated to a proxy, the proxy config will have to be 
+# refreshed manually.
+
+- hosts: zabbix_client
+  become: true
+
+  pre_tasks:
+  - name: Needed packages
+    dnf:
+      name: "{{ item }}"
+      state: present
+    loop:
+    - python3-netaddr
+    - python3-libsemanage
+
+  roles:
+  - role: community.zabbix.zabbix_agent

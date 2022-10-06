@@ -1,0 +1,5 @@
+---
+ansible_host: 192.168.4.181
+zabbix_agent_server: proxy-1.gcp.red-tux.com
+zabbix_agent_serveractive	: proxy-1.gcp.red-tux.com
+zabbix_proxy: proxy-1

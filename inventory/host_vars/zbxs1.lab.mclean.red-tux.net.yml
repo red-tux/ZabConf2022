@@ -1,0 +1,27 @@
+---
+ansible_host: 192.168.4.170
+
+
+zabbix_server_dbhost: localhost
+zabbix_server_database: pgsql
+zabbix_server_database_long: postgresql
+# zabbix_server_dbport: 5432
+zabbix_server_dbname: zabbix
+zabbix_server_dbuser: zabbix
+zabbix_server_dbpassword: SOME_SECRET_STRING
+zabbix_database_sqlload: False
+zabbix_server_dbhost_run_install: False
+zabbix_database_creation: False
+zabbix_server_allowunsupporteddbversions: 1
+zabbix_selinux: True
+selinux_allow_zabbix_can_network: True
+selinux_allow_zabbix_can_http: True
+
+zabbix_server_cachesize: 64M
+
+apache_create_vhosts: False
+
+php_date_timezone: "America/New_York"
+php_memory_limit: "128M"
+php_max_execution_time: "300"
+php_upload_max_filesize: "256M"

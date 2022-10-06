@@ -1,0 +1,71 @@
+---
+- hosts: status_RUNNING
+  gather_facts: False
+  connection: local
+  become: False
+
+  tasks:
+  # - debug: var=hostvars
+
+  - name: get managed zone info
+    gcp_dns_managed_zone_info:
+      dns_name: gcp.red-tux.com.
+      auth_kind: serviceaccount
+      service_account_file: "/home/anelson/ansible/home/zabconf2022/argon-tuner-364304-d90622a75d5b.json"
+      project: argon-tuner-364304
+    register: zone_info
+    run_once: true
+
+  # - debug: var=zone_info
+
+  # - name: get info on a resource record set
+  #   gcp_dns_resource_record_set_info:
+  #     managed_zone: 
+  #       name: gcp-redtux-com
+  #       dnsName: "{{ inventory_hostname }}.gcp.red-tux.com"
+  #     project: argon-tuner-364304
+  #     auth_kind: serviceaccount
+  #     service_account_file: "/home/anelson/ansible/home/zabconf2022/argon-tuner-364304-d90622a75d5b.json"
+  #   register: dns_info
+
+  # - debug: var=dns_info
+
+  - name: ensure external DNS entry is created
+    google.cloud.gcp_dns_resource_record_set:
+      managed_zone: 
+        name: gcp-redtux-com
+        dnsName: gcp.red-tux.com.
+      state: present
+      name: "{{ host.inventory_hostname }}.gcp.red-tux.com."
+      type: A
+      target: "{{ host.networkInterfaces[0].accessConfigs[0].natIP }}"
+
+      ttl: 900
+      project: argon-tuner-364304
+      auth_kind: serviceaccount
+      service_account_file: "/home/anelson/ansible/home/zabconf2022/argon-tuner-364304-d90622a75d5b.json"
+    vars:
+      host: "{{ hostvars[item] }}"
+    loop: "{{ play_hosts }}"
+    run_once: true
+    # register: dns_entry
+
+  - name: ensure internal DNS entry is created
+    google.cloud.gcp_dns_resource_record_set:
+      managed_zone: 
+        name: internal-gcp-redtux-com
+        dnsName: gcp.red-tux.com.
+      state: present
+      name: "{{ host.inventory_hostname }}.gcp.red-tux.com."
+      type: A
+      target: "{{ host.networkInterfaces[0].networkIP }}" 
+      ttl: 900
+      project: argon-tuner-364304
+      auth_kind: serviceaccount
+      service_account_file: "/home/anelson/ansible/home/zabconf2022/argon-tuner-364304-d90622a75d5b.json"
+    vars:
+      host: "{{ hostvars[item] }}"
+    loop: "{{ play_hosts }}"
+    run_once: true    # register: dns_entry
+
+  # - debug: var=dns_entry

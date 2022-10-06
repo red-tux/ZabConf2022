@@ -1,0 +1,13 @@
+---
+plugin: community.zabbix.zabbix_inventory
+server_url: https://server-1.gcp.red-tux.com
+login_user: zabconf
+login_password: 10years2022
+host_zapi_query:
+  selectInterfaces: 'extend'
+validate_certs: false
+groups:
+  enabled: zbx_status == "0"
+  disabled: zbx_status == "1"
+compose:
+  ansible_host: (zbx_interfaces | selectattr('type','==','1') | first).ip

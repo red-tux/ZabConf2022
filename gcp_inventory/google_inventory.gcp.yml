@@ -1,0 +1,27 @@
+---
+plugin: gcp_compute
+projects:
+- argon-tuner-364304
+auth_kind: serviceaccount
+service_account_file: /home/anelson/ansible/home/zabconf2022/argon-tuner-364304-d90622a75d5b.json
+hostnames: name
+keyed_groups:
+- prefix: gcp
+  key: labels
+- prefix: status
+  key: status
+compose:
+  # Set an inventory parameter to use the Public IP address to connect to the host
+  # For Private ip use "networkInterfaces[0].networkIP"
+  ansible_user: nelsonab
+  ansible_host: networkInterfaces[0].accessConfigs[0].natIP
+  zabbix_agent_server: metadata.zabbix_agent_server | default(omit)
+  zabbix_agent_serveractive: metadata.zabbix_agent_serveractive | default(omit)
+  zabbix_proxy: metadata.zabbix_proxy | default(omit)
+groups:
+  zabbix_server: '"server" in labels["role"]'
+  zabbix_proxy: '"proxy" in labels["role"]'
+  zabbix_client: '"client" in labels["role"]'
+  zabbix: true
+# filters:
+# - 'status = "RUNNING"'

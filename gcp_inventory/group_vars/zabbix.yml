@@ -1,0 +1,17 @@
+---
+zabbix_agent_server: "server-1.gcp.red-tux.com"
+zabbix_agent_serveractive: "server-1.gcp.red-tux.com"
+zabbix_api_validate_certs: False
+zabbix_api_server_url: https://server-1.gcp.red-tux.com
+zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
+# ansible_zabbix_auth_key: ebb560877c9397e800febd93c6d0a87031b0b1c7b34d6ac26e358914353fa614
+zabbix_api_login_user: Admin
+zabbix_api_login_pass: SOME_SECRET_STRING
+zabbix_api_create_hosts: True
+zabbix_agent_host_state: present
+zabbix_install_pip_packages: False
+zabbix_host_groups:
+  - Linux servers
+zabbix_agent_link_templates:
+  - Linux generic by Zabbix agent
+zabbix_useuip: '0'

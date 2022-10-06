@@ -1,0 +1,42 @@
+---
+zabbix_server_version: '6.2'
+zabbix_server_dbhost: localhost
+zabbix_server_database: pgsql
+zabbix_server_database_long: postgresql
+# zabbix_server_dbport: 5432
+zabbix_server_dbname: zabbix
+zabbix_server_dbuser: zabbix
+zabbix_server_dbpassword: SOME_SECRET_STRING
+zabbix_database_sqlload: False
+# zabbix_server_dbhost_run_install: False
+zabbix_database_creation: False
+zabbix_server_allowunsupporteddbversions: 1
+zabbix_selinux: True
+selinux_allow_zabbix_can_network: True
+selinux_allow_zabbix_can_http: True
+
+zabbix_apache_tls: True
+zabbix_apache_redirect: True
+# zabbix_apache_tls_chain: /etc/pki/tls/cert.pem
+# zabbix_apache_tls_key: /etc/pki/tls/private/20221002-2p8-g9s.private.pem
+# zabbix_apache_tls_crt: /etc/pki/tls/certs/certificate.crt
+
+zabbix_apache_tls_key: /etc/pki/tls/private/self-signed.key
+zabbix_apache_tls_crt: /etc/pki/tls/certs/self-signed.crt
+
+zabbix_server_cachesize: 64M
+
+apache_create_vhosts: False
+
+zabbix_php_version: '7.4'
+php_date_timezone: "America/New_York"
+php_memory_limit: "128M"
+php_max_execution_time: "300"
+php_upload_max_filesize: "256M"
+
+
+zabbix_agent_serveractive: 127.0.0.1
+zabbix_agent_hostname: 'Zabbix server'
+
+zabbix_api_create_hosts: False
+zabbix_useuip: '1'

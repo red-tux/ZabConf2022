@@ -1,0 +1,16 @@
+---
+- hosts: all
+  gather_facts: no
+
+  tasks: 
+  - name: get proxy details
+    community.zabbix.zabbix_proxy_info:
+      login_user: Admin
+      login_password: zabbix
+      server_url: http://zbxs1.lab.mclean.red-tux.net/zabbix
+      proxy_hosts: true
+      proxy_name: "{{ inventory_hostname }}"
+    delegate_to: localhost
+    register: proxy_out
+
+  - debug: var=proxy_out

@@ -1,0 +1,11 @@
+---
+collections:
+- name: community.zabbix
+- name: community.postgresql
+
+roles:
+- name: geerlingguy.apache
+- name: geerlingguy.php
+
+  #pip:
+  #- zabbix-api

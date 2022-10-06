@@ -1,2 +1,3 @@
-# ZabConf2022
-Zabbix and Ansible presentation from Zabbix conference 2022
+# zabconf2022
+
+Zabbix Conference 2022

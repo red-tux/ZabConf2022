@@ -1,0 +1,19 @@
+---
+zabbix_proxy_database: sqlite3
+zabbix_proxy_database_long: sqlite3
+zabbix_proxy_dbname: zabbix_proxy
+
+zabbix_proxy_server: server-1.gcp.red-tux.com
+zabbix_proxy_statsallowedip: "127.0.0.1,server-1.gcp.red-tux.net"
+# Use DNS to connect with server
+zabbix_useuip: 0
+
+# both values need to be set and they refer to different items
+# status is for the API, mode is for the proxy config file
+# zabbix_proxy_status: passive
+# zabbix_proxy_mode: 1
+
+zabbix_proxy_status: active
+zabbix_proxy_mode: 0
+
+zabbix_api_create_proxy: True
